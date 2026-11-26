@@ -1,0 +1,48 @@
+=== Same graph, three algorithms ===
+Kruskal
+  Kruskal adds A-D (5)  [joins two different components]
+  Kruskal adds C-E (5)  [joins two different components]
+  Kruskal adds D-F (6)  [joins two different components]
+  Kruskal adds A-B (7)  [joins two different components]
+  Kruskal adds B-E (7)  [joins two different components]
+  Kruskal rejects B-C (8)  [would form a cycle]
+  Kruskal rejects E-F (8)  [would form a cycle]
+  Kruskal rejects B-D (9)  [would form a cycle]
+  Kruskal adds E-G (9)  [joins two different components]
+  Kruskal rejects F-G (11)  [would form a cycle]
+  Kruskal rejects D-E (15)  [would form a cycle]
+  MST edges: [('A', 'B', 7), ('A', 'D', 5), ('B', 'E', 7), ('C', 'E', 5), ('D', 'F', 6), ('E', 'G', 9)]
+  Total cost = 39
+
+Prim
+  Prim adds A-D (5)  [cheapest edge leaving the tree]
+  Prim adds D-F (6)  [cheapest edge leaving the tree]
+  Prim adds A-B (7)  [cheapest edge leaving the tree]
+  Prim adds B-E (7)  [cheapest edge leaving the tree]
+  Prim adds E-C (5)  [cheapest edge leaving the tree]
+  Prim adds E-G (9)  [cheapest edge leaving the tree]
+  MST edges: [('A', 'B', 7), ('A', 'D', 5), ('B', 'E', 7), ('C', 'E', 5), ('D', 'F', 6), ('E', 'G', 9)]
+  Total cost = 39
+
+Boruvka
+  Boruvka round 1: each component picks its cheapest outgoing edge -> adds [('A', 'B', 7), ('A', 'D', 5), ('C', 'E', 5), ('D', 'F', 6), ('E', 'G', 9)]
+  Boruvka round 2: each component picks its cheapest outgoing edge -> adds [('B', 'E', 7)]
+  MST edges: [('A', 'B', 7), ('A', 'D', 5), ('B', 'E', 7), ('C', 'E', 5), ('D', 'F', 6), ('E', 'G', 9)]
+  Total cost = 39
+
+=== Stress: make several MSTs with equal total cost (ties) ===
+  Kruskal      edges [('P', 'Q', 1), ('Q', 'R', 1), ('R', 'S', 1)] total 3
+  Prim from P  edges [('P', 'Q', 1), ('P', 'S', 1), ('Q', 'R', 1)] total 3
+  Prim from R  edges [('P', 'Q', 1), ('P', 'S', 1), ('Q', 'R', 1)] total 3
+  Boruvka      edges [('P', 'Q', 1), ('Q', 'R', 1), ('R', 'S', 1)] total 3
+Observation: the algorithms can return DIFFERENT edge sets, all with the same minimum total (here 3).
+All are correct: the MST is unique only when edge weights are distinct; ties allow several optimal trees.
+
+=== Industry decision ===
+A. Sparse network (E ~ V): Kruskal - sorting E edges is cheap, union-find is tiny, simple edge-list storage.
+   Prim with a binary heap is also fine (O(E log V)).
+B. Dense network (E ~ V^2): Prim with an adjacency matrix / array (O(V^2)) avoids sorting ~V^2 edges and scans
+   neighbours of one growing tree sequentially; Kruskal would waste time sorting a huge edge list.
+C. Very large graph on parallel/distributed hardware: Boruvka - every component picks its cheapest edge
+   independently in each round, components at least halve each round (O(log V) rounds), so the work parallelises;
+   Kruskal's single global sorted order and Prim's single growing tree are inherently sequential.

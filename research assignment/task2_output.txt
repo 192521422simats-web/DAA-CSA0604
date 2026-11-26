@@ -1,0 +1,38 @@
+2.1 NORMAL CASE - classic instance, capacity 50 (fractional knapsack: greedy is optimal)
+  take whole A (ratio 6.00) -> value 60.00, room 40
+  take whole B (ratio 5.00) -> value 160.00, room 20
+  take 0.667 of C (ratio 4.00) -> value 240.00, room 0
+Solution A (fractional greedy): value = 240.00, selected = [('A', 1.0), ('B', 1.0), ('C', 0.667)]
+Solution B (0/1 DP)           : value = 220, selected items = ['B', 'C']   (0/1 cannot split, so it is lower)
+
+2.2 BREAK THE GREEDY INTUITION (0/1 problem), capacity 10
+Ratio greedy applied to 0/1:
+  commit X (w=1, v=2, ratio 2.00) -> value 2, room 9
+  skip Y (w=10 does not fit in room 9)
+  greedy value = 2, items = ['X']
+  DP optimum   = 15, items = ['Y']
+  First greedy commitment preventing the optimum: taking X (ratio 2.0) first leaves room 9, so Y (w=10) can
+  never fit; the best choice was Y alone (15 > 2).
+
+Second counterexample, capacity 10:
+  commit P (w=5, v=30, ratio 6.00) -> value 30, room 5
+  commit Q (w=4, v=24, ratio 6.00) -> value 54, room 1
+  skip S (w=3 does not fit in room 1)
+  skip R (w=6 does not fit in room 1)
+  greedy value = 54 items ['P', 'Q'];  DP optimum = 55 items ['Q', 'R']
+
+2.3 ENGINEERING COMPARISON (work, memory, quality, guarantee)
+    n     cap | greedy ops greedy value |     DP ops   DP cells  DP value | gap
+   10     100 |         15          406 |       1010       1111       446 |  8.97%
+  100    1000 |        156         6803 |     100100     101101      6821 |  0.26%
+  500    5000 |        763        35283 |    2500500    2505501     35283 |  0.00%
+ 1000   20000 |       1739        89886 |   20001000   20021001     89897 |  0.01%
+
+Greedy: ~n log n work, O(n) memory, optimal ONLY for the fractional version; for 0/1 it carries no guarantee.
+DP: O(nW) work and O(nW) memory (table cells), always optimal for 0/1, but cost grows with capacity W.
+
+2.4 CHANGED REQUIREMENT ("return extremely quickly; near-optimal acceptable")
+The table shows that the 0/1 ratio-greedy answer is within a small percentage of the DP optimum on random
+data while using orders of magnitude less work and memory, so I would choose the greedy strategy (optionally
+improved by also comparing with the best single item). I would keep DP when the loss in value on adversarial
+instances like the counterexample above is unacceptable and W is small enough for the table to fit.
