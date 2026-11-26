@@ -1,0 +1,42 @@
+=== B4.1 Practical strategy: First Fit Decreasing ===
+Capacity 100, workloads [42, 69, 29, 31, 56, 12, 8, 77, 20, 55, 33, 18, 40, 25, 9]
+  Servers used: 6
+   Server 1: workloads [77, 20]  used 97  remaining capacity 3
+   Server 2: workloads [69, 31]  used 100  remaining capacity 0
+   Server 3: workloads [56, 42]  used 98  remaining capacity 2
+   Server 4: workloads [55, 40]  used 95  remaining capacity 5
+   Server 5: workloads [33, 29, 25, 12]  used 99  remaining capacity 1
+   Server 6: workloads [18, 9, 8]  used 35  remaining capacity 65
+  Lower bound (total demand / capacity, rounded up) = 6
+
+=== B4.2 Challenge the strategy (input where FFD is NOT optimal) ===
+Capacity 18, workloads [15, 10, 10, 8, 7, 6, 5, 4, 4]
+  Servers used: 5
+   Server 1: workloads [15]  used 15  remaining capacity 3
+   Server 2: workloads [10, 8]  used 18  remaining capacity 0
+   Server 3: workloads [10, 7]  used 17  remaining capacity 1
+   Server 4: workloads [6, 5, 4]  used 15  remaining capacity 3
+   Server 5: workloads [4]  used 4  remaining capacity 14
+  Exact optimum (small exhaustive check) = 4 servers  <- FFD used one more.
+  Optimal packing: {15}, {10,8}, {10,4,4}, {7,6,5} - three bins filled exactly to 18 plus {15} (total waste 3).
+  Reason FFD fails: it puts the second 10 with 7 (the first bin where it fits, 17/18) and later has to open a
+  5th bin for the leftover 4. The optimum needs 10 paired with 4+4 and 7 paired with 6+5; greedy commitments
+  made early cannot be undone.
+
+=== Scale check: thousands of workloads ===
+ workloads  servers (FFD)  lower bound  time (s)
+      1000            310          310     0.005
+      3000            915          915     0.044
+      6000           1830         1830     0.153
+
+=== B4.3 Algorithm Engineering Decision Note ===
+Why exhaustive search is unattractive: assigning n workloads to servers has up to n^n (Bell-number scale) arrangements;
+even the pruned exact search above becomes impractical beyond a few dozen workloads, while production receives thousands.
+Guarantee of FFD: never worse than (11/9)*OPT + 6/9 servers - a proven bound, not optimality (see B4.2 counterexample).
+Computational advantage: sorting O(n log n) plus a scan for the first fit (O(n * servers) here; O(n log n) with a
+tree structure); the scale table shows thousands of workloads placed in well under a second, and in practice the
+servers used are within ~1 of the theoretical lower bound.
+When an exact approach is appropriate: small batches, or when each server is very expensive (e.g. dedicated
+hardware or licences) and a one-off planning job can run for minutes or hours; also to benchmark the heuristic offline.
+Evidence to monitor before deployment: servers used vs the lower bound ceil(sum/capacity), utilisation per server,
+placement latency at peak load, behaviour on adversarial/skewed demand distributions, and how often rebalancing is needed.

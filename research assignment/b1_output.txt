@@ -1,0 +1,49 @@
+=== B1.1 Validation tests ===
+Test 1: 5-cycle with k=3 (colourable). Verifies the search finds a valid colouring.
+  C5,k=3: colourable=True, colouring=[0, 1, 0, 1, 2], nodes=6, candidates=9, rejected=4, backtracks=0, max depth=5
+Test 2: K4 (complete graph on 4 vertices) with k=3 (NOT colourable). Verifies failure is reported.
+  K4,k=3: colourable=False, colouring=None, nodes=16, candidates=48, rejected=33, backtracks=15, max depth=3
+Test 3 (boundary): single vertex k=1, no vertices, and one edge with k=1.
+  1 vertex,k=1: colourable=True, colouring=[0], nodes=2, candidates=1, rejected=0, backtracks=0, max depth=1
+  0 vertices,k=1: colourable=True, colouring=[], nodes=1, candidates=0, rejected=0, backtracks=0, max depth=0
+  edge,k=1: colourable=False, colouring=None, nodes=2, candidates=2, rejected=1, backtracks=1, max depth=1
+
+=== B1.2 Design vs implementation ===
+Implementation difference from the pseudocode: neighbours are stored as sets so the feasibility test only
+scans the neighbours of the current vertex (not all edges); a 'colour array' with -1 = uncoloured is used, and
+counters were added for nodes/candidates/rejections/backtracks.
+
+=== B1.3/B1.4 Version 1 (input order) vs Version 2 (degree/connectivity heuristic) ===
+Graph                                         Measure                Version 1 Version 2
+Ring of 10 + 2 chords (k=3, colourable)       Search nodes                  11        11
+                                              Candidate assignments         15        15
+                                              Rejected branches              5         5
+                                              Backtracks                     0         0
+Path of 10 + K4 (k=3, NOT colourable)         Search nodes               26110        16
+                                              Candidate assignments      78330        48
+                                              Rejected branches          52221        33
+                                              Backtracks                 26109        15
+Complete bipartite K4,4 (k=2)                 Search nodes                   9         9
+                                              Candidate assignments         12        12
+                                              Rejected branches              4         4
+                                              Backtracks                     0         0
+
+Answer: yes on the graphs with a hidden dense core (Path + K4): the heuristic starts with the K4 vertices, finds that
+3 colours cannot colour them after a handful of nodes and stops, while input order first enumerates thousands of
+colourings of the path before reaching the K4. On graphs that are easy in any order (ring with chords, K4,4) the
+two versions behave similarly, so the heuristic helps when conflicts are concentrated in a dense part of the graph.
+
+=== B2 Adversarial input: same n = 16 vertices, same k = 3 ===
+PREDICTION: Graph B needs far more search. The K4 (not 3-colourable) is only reached at depth 12; before that the
+algorithm happily assigns the path vertices (3*2^11 = 6144 colourings), and each one fails at the K4. Rejected
+branches will appear only late (deep in the tree), so pruning happens late. Graph A succeeds on the first dive.
+  Graph A (path, easy): colourable=True, colouring=[0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1], nodes=17, candidates=24, rejected=8, backtracks=0, max depth=16
+  Graph B (path + hidden K4): colourable=False, colouring=None, nodes=104446, candidates=313338, rejected=208893, backtracks=104445, max depth=15
+
+Why input size alone is not enough: both graphs have 16 vertices and k=3, yet the search effort differs by orders of
+magnitude. Backtracking cost depends on the STRUCTURE of the instance - where conflicts occur relative to the search
+order. In Graph B the contradiction (K4 needing 4 colours) is independent of the path vertices, but the search cannot
+know that, so it re-explores every path colouring (thrashing). Structural property: a dense subgraph (clique larger
+than k) that is ordered last and disconnected from the earlier vertices.
+(Version 2 order, for comparison:)
+  Graph B, Version 2 order: colourable=False, colouring=None, nodes=16, candidates=48, rejected=33, backtracks=15, max depth=3

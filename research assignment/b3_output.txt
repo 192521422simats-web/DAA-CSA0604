@@ -1,0 +1,33 @@
+=== B3.1 Three small instances (not chosen to make greedy look good) ===
+ Instance  Exact size  Greedy size  Same?
+        1           2            2   True
+        2           2            2   True
+        3           2            3  False
+
+=== B3.2 Counterexample (instance 3 above) ===
+Zones 1..6; X={1,2,3,4}, Y={1,3,5}, Z={2,4,6}
+  Exact optimum: ['Y', 'Z'] -> 2 centres
+  Greedy trace:
+    pick X (covers 4 new zones) -> uncovered now [5, 6]
+    pick Y (covers 1 new zones) -> uncovered now [6]
+    pick Z (covers 1 new zones) -> uncovered now []
+  Greedy result: ['X', 'Y', 'Z'] -> 3 centres
+  Decision that led away from the optimum: choosing X first (largest immediate coverage, 4 zones). It covers
+  only zones that Y and Z would also cover, leaving 5 and 6 which then require TWO more centres.
+
+=== B3.3 Increasing problem size (random instances) ===
+zones  centres |  exact combos examined  exact time(s)  exact size |  greedy ops  greedy size
+    8        8 |                    189          0.000           5 |          40            5
+   12       12 |                    468          0.000           4 |          60            5
+   16       16 |                   2826          0.003           5 |          80            5
+   20       20 |                  43888          0.048           6 |         140            7
+   24       24 |                  22522          0.025           5 |         120            5
+   30       26 |                  21853          0.025           5 |         130            5
+
+=== B3.4 Engineering trade-off ===
+Gain: greedy needs ~ (cover size x number of centres) set operations - almost constant growth in this table - while the
+exact search examines a rapidly growing number of combinations (it grows like C(m, k): exponential in the number of centres).
+Sacrifice: the greedy cover can be larger than the minimum (counterexample above) and has no optimality guarantee, only a
+logarithmic approximation ratio (H(n) ~ ln n) in the worst case; in these random instances it was usually equal or +1.
+I would accept greedy in a real emergency-planning system with hundreds of candidate centres where a result is needed in
+seconds, an extra centre is affordable, and the plan will be re-run as conditions change.
