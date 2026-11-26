@@ -1,0 +1,66 @@
+Baseline run:
+
+=== Width M = 25 ===
+Line 1: 'Dynamic programming'  words=2  unused=6  penalty=36
+Line 2: 'solves overlapping'  words=2  unused=7  penalty=49
+Line 3: 'subproblems by storing'  words=3  unused=3  penalty=9
+Line 4: 'answers to smaller'  words=3  unused=7  penalty=49
+Line 5: 'problems'  words=1  unused=17  penalty=0
+Minimum total penalty = 143
+
+Intermediate DP states (width M = 6), small text for readability:
+  best[4] = 0   (no words left)
+    try line words[3:4] unused=1 penalty=0 + best[4]=0 = 0
+  best[3] = 0  (best next line start = word 4)
+    try line words[2:3] unused=4 penalty=16 + best[3]=0 = 16
+  best[2] = 16  (best next line start = word 3)
+    try line words[1:2] unused=4 penalty=16 + best[2]=16 = 32
+    try line words[1:3] unused=1 penalty=1 + best[3]=0 = 1
+  best[1] = 1  (best next line start = word 3)
+    try line words[0:1] unused=3 penalty=9 + best[1]=1 = 10
+    try line words[0:2] unused=0 penalty=0 + best[2]=16 = 16
+  best[0] = 10  (best next line start = word 1)
+Meaning: best[i] is the minimum penalty to lay out words i..end; 'try line' rows are the candidate
+first-lines starting at word i; the cheapest candidate (penalty + best[j]) becomes best[i].
+
+--- Requirement change: three more line widths (predictions made before running) ---
+Write your own prediction for each width BEFORE running (arrangement change? where first? penalty up/down?).
+Reference reasoning: fewer words fit per line when M shrinks, so line breaks move; but the penalty does NOT
+simply grow or shrink with M - it depends on how well the word lengths happen to fit the width.
+For very wide lines only a few lines exist, and the final line is free, so only the non-final lines can add penalty.
+
+=== Width M = 20 ===
+Line 1: 'Dynamic programming'  words=2  unused=1  penalty=1
+Line 2: 'solves overlapping'  words=2  unused=2  penalty=4
+Line 3: 'subproblems by'  words=2  unused=6  penalty=36
+Line 4: 'storing answers to'  words=3  unused=2  penalty=4
+Line 5: 'smaller problems'  words=2  unused=4  penalty=0
+Minimum total penalty = 45
+
+=== Width M = 35 ===
+Line 1: 'Dynamic programming solves'  words=3  unused=9  penalty=81
+Line 2: 'overlapping subproblems by storing'  words=4  unused=1  penalty=1
+Line 3: 'answers to smaller problems'  words=4  unused=8  penalty=0
+Minimum total penalty = 82
+
+=== Width M = 60 ===
+Line 1: 'Dynamic programming solves overlapping subproblems by'  words=6  unused=7  penalty=49
+Line 2: 'storing answers to smaller problems'  words=5  unused=25  penalty=0
+Minimum total penalty = 49
+
+--- Boundary tests ---
+
+=== Width M = 6 ===
+Line 1: 'abcdef'  words=1  unused=0  penalty=0
+Line 2: 'abcdef'  words=1  unused=0  penalty=0
+Line 3: 'abcdef'  words=1  unused=0  penalty=0
+Minimum total penalty = 0
+
+=== Width M = 1 ===
+Line 1: 'a'  words=1  unused=0  penalty=0
+Minimum total penalty = 0
+
+=== Width M = 5 ===
+Handled error: A word is longer than the line width 5
+Why chosen: words that exactly fill the width test the off-by-one in length (sum + spaces); a word
+longer than the width tests the failure path; a single-word text tests the free-final-line rule.
