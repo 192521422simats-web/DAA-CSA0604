@@ -1,12 +1,12 @@
-# Assignment 3 - Divide and Conquer (pair work)
-| File | Question |
+# Assignment 4 Part II - Implement, Test, Debug and Optimise
+| File | Task |
 |---|---|
-| `q1_maxmin_binary.py` | Q1 D&C Max/Min (3n/2 - 2 comparisons) and Binary search counts |
-| `q2_sorting_dc.py` | Q2 Merge Sort vs Quick Sort (balanced / unbalanced input, partition sizes, depth) |
-| `q3_karatsuba.py` | Q3 School vs Karatsuba multiplication, multiplication counts and timing |
-| `q4_strassen.py` | Q4 Conventional vs Strassen matrices, padding, cutoff experiment |
-| `q5_closest_pair_dc.py` | Q5 D&C closest pair vs brute force |
-| `q6_selection_and_meet_in_middle.py` | Q6 Median of Medians vs QuickSelect; Meet-in-the-Middle subset sum |
-| `q7_max_subarray_dc.py` | Q7 Day-4 design (maximum subarray) with design notes in the docstring |
-Run any file with `python <file>.py`. Sample outputs: `q*_output.txt`.
-Note: both partners must be able to explain every file (see the individual-verification section of the assignment).
+| `task1_word_wrap.py` | Task 1 Word wrap DP: lines, unused spaces, penalties, DP states, 3 widths, boundary tests |
+| `task2_greedy_vs_dp.py` | Task 2 Fractional greedy vs 0/1 DP knapsack, counterexample, work/memory comparison |
+| `task3_routing.py` | Task 3 Dijkstra, negative edge, Bellman-Ford, negative-cycle detection, Floyd, Warshall |
+| `task4_assembly_line.py` | Task 4 Assembly-line DP with trace, route, prediction and disruption experiments |
+| `task5_mst.py` | Task 5 Kruskal, Prim and Boruvka traces, tie / multiple-MST experiment |
+| `task6_tsp_dp.py` | Task 6 TSP Held-Karp DP, validation against brute force, state-space growth |
+The word-wrap penalty formula was missing in the document text; `PENALTY_POWER = 2` (penalty = unused^2) is at the top of
+`task1_word_wrap.py` - change it if your question paper uses a different formula.
+Sample outputs: `task*_output.txt`.
