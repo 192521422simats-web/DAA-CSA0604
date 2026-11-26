@@ -1,0 +1,18 @@
+Check: 1234 x 5678 = 7006652 OK
+
+ digits  school mults  karatsuba mults  school time(ms)  karat time(ms) faster
+      4            16               13            0.053           0.013 Karatsuba
+      8            64               44            0.021           0.035 School
+     16           256              139            0.080           0.086 School
+     32          1024              390            0.273           0.261 Karatsuba
+     64          4096             1228            1.001           0.856 Karatsuba
+    128         16384             3622            4.420           2.731 Karatsuba
+    256         65536            11048           18.582           8.800 Karatsuba
+    512        262144            33053           88.307          30.253 Karatsuba
+   1024       1048576            99242          551.731         140.877 Karatsuba
+
+Counts: Karatsuba needs far fewer digit multiplications as n grows (n^1.585 vs n^2). The crossover in TIME
+appears where the saved multiplications outweigh the extra additions, subtractions, divmod/splitting and
+recursion-call overhead (see the 'faster' column for the approximate range in this Python implementation).
+Better asymptotic complexity does not guarantee a faster program at every size: constants and overheads
+dominate for small inputs. Practical libraries switch to the standard method below a cutoff size.

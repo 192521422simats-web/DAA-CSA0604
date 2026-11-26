@@ -1,0 +1,27 @@
+Part A: Max/Min (predicted D&C comparisons = 3n/2 - 2 for n = 2^k)
+      n  D&C observed   3n/2-2  naive 2(n-1)  correct
+      2             1        1             2  True
+      8            10       10            14  True
+     64            94       94           126  True
+   1024          1534     1534          2046  True
+   8192         12286    12286         16382  True
+  65536         98302    98302        131070  True
+Non power-of-2 sizes: the simple midpoint split gives somewhat more than ceil(3n/2)-2 (the formula is exact
+only for n = 2^k), but still well below the naive 2(n-1):
+  n=    5: 6 comparisons, ceil(3n/2)-2 = 6, naive 2(n-1) = 8
+  n=    7: 9 comparisons, ceil(3n/2)-2 = 9, naive 2(n-1) = 12
+  n=  100: 162 comparisons, ceil(3n/2)-2 = 148, naive 2(n-1) = 198
+  n= 1000: 1510 comparisons, ceil(3n/2)-2 = 1498, naive 2(n-1) = 1998
+
+Part B: Binary search (successful and unsuccessful) - comparison counts
+       n  found(mid)  found(first)  found(last)  missing  log2(n)
+      10           5             5            7        8      3.3
+     100          11            11           13       14      6.6
+    1000          17            17           19       20     10.0
+   10000          25            25           27       28     13.3
+  100000          31            31           33       34     16.6
+ 1000000          37            37           39       40     19.9
+
+Each step eliminates half the range, so at most floor(log2 n)+1 probes are needed.
+(Counts above include both the == and < tests per probe, i.e. about 2x the number of probes.)
+Termination: the loop stops when lo > hi (empty range) - the key cannot exist anywhere else.

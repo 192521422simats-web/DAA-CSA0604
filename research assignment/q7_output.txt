@@ -1,0 +1,20 @@
+Correctness tests (D&C vs brute force):
+  [-2, 1, -3, 4, -1, 2, 1, -5, 4] -> brute 6, D&C 6, PASS
+  [-5, -2, -9] -> brute -2, D&C -2, PASS
+  [7] -> brute 7, D&C 7, PASS
+  [1, 2, 3] -> brute 6, D&C 6, PASS
+  [-1, 5, -1, 5, -1] -> brute 9, D&C 9, PASS
+  500 random tests passed
+
+      n |    brute ops  time(s) |  D&C calls  time(s)
+    100 |         5050    0.001 |        199   0.0001
+   1000 |       500500    0.081 |       1999   0.0008
+   4000 |      8002000    1.350 |       7999   0.0037
+   8000 |     32004000    5.775 |      15999   0.0064
+  64000 |   2048032000*      nan |     127999   0.0481
+(* = n(n+1)/2 computed, brute force not run)
+
+Why D&C suits it: the answer for a range can be built from small summaries of its two halves.
+Work reduced: re-adding overlapping windows (O(n^2) -> O(n)). Extra cost: recursion calls and O(log n) stack.
+Not appropriate when subproblems overlap heavily or the combine step costs as much as solving from scratch.
+Look for: a way to split into independent subproblems of similar size, a cheap combine, and a simple base case.

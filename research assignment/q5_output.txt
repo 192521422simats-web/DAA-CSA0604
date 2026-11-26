@@ -1,0 +1,16 @@
+Correctness: D&C result must equal brute-force result on 200 random sets (including a pair straddling the divider)
+  all tests passed
+
+     n | brute dist calcs  time(s) | D&C dist calcs  time(s) | ratio
+    50 |             1225    0.000 |             65    0.000 |   18.8x
+   100 |             4950    0.001 |            126    0.000 |   39.3x
+   500 |           124750    0.027 |            536    0.001 |  232.7x
+  1000 |           499500    0.089 |           1133    0.003 |  440.9x
+  2000 |          1999000    0.393 |           2309    0.006 |  865.7x
+  4000 |          7998000    1.714 |           4626    0.016 | 1728.9x
+  8000 |         31996000    7.056 |           9347    0.037 | 3423.1x
+
+D&C pays for sorting and strip building but its distance calculations grow ~ n log n instead of n^2/2, so
+it becomes advantageous once n is in the low hundreds (see table). The strip step does not compare every
+point with every other: only points within d of the dividing line matter, and in y-order only the next few
+neighbours can be closer than d, giving linear work per level.

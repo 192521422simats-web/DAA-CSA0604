@@ -1,0 +1,30 @@
+PART A - k-th smallest (median) selection; comparisons counted
+     n input           QuickSelect(first)  QuickSelect(random)  MedianOfMedians
+  1000 random                        2769                 2168             9044
+  1000 sorted                      375750                 4154             8892
+  5000 random                       19566                22711            48166
+  5000 sorted                     9378750                17530            46364
+
+Note: on random data Median of Medians does MORE work than QuickSelect (larger constant factor) but its
+worst case never degrades; QuickSelect(first) explodes on sorted input.
+Grouping: split into groups of 5, take each group's median, recursively find the median of those medians
+and use it as pivot. This pivot is guaranteed to have at least ~30% of the elements on each side, so each
+partition discards a constant fraction -> T(n) <= T(n/5) + T(7n/10) + O(n) = O(n) worst case.
+The deterministic 'first element' pivot on sorted input gives n^2/2-type work. Random pivots make that
+unlikely but cannot rule it out (a bad sequence of random picks is still possible).
+Student B verification: pivot quality decides how much of the data each step discards; poor pivots discard
+almost nothing, so the work becomes quadratic.
+
+PART B - Meet-in-the-Middle subset sum (target chosen so that NO subset matches: worst case)
+  n  2^n enumeration  MITM work  MITM memory(sums)
+ 10             1024         96                 64
+ 16            65536        768                512
+ 20          1048576       3072               2048
+ 22          4194304       6144               4096
+
+Correctness: nums = [3, 34, 4, 12, 5, 2]  target 9 -> True  target 30 -> False
+
+Split the n numbers into two halves; each half has 2^(n/2) subset sums. Sort one list and, for each sum s of
+the other, binary-search for target - s. Time ~ O(2^(n/2) * n) instead of 2^n, using O(2^(n/2)) extra memory
+(the time-memory trade-off). Student A verification: extra storage lets us replace one huge enumeration of
+2^n combinations by two small enumerations plus fast lookups, so the total work shrinks dramatically.

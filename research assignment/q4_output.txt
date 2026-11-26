@@ -1,0 +1,29 @@
+Correctness: 2x2 example and a 5x5 (needs padding)
+  Strassen 2x2 : [[19, 22], [43, 50]]  conventional: [[19, 22], [43, 50]]
+  5x5 padded Strassen == conventional: True
+
+   n |  conv mults  conv adds   conv ms |  str mults   str adds    str ms | faster
+   2 |           8          4      0.00 |          7         18      0.02 | Conventional
+   4 |          64         48      0.01 |         49        198      0.11 | Conventional
+   8 |         512        448      0.04 |        343       1674      0.84 | Conventional
+  16 |        4096       3840      0.27 |       2401      12870      5.53 | Conventional
+  32 |       32768      31744      2.10 |      16807      94698     39.42 | Conventional
+  64 |      262144     258048     16.75 |     117649     681318    303.75 | Conventional
+ 128 |     2097152    2080768    143.23 |     823543    4842954   2410.70 | Conventional
+
+Strassen with a cutoff (switch to conventional multiplication for blocks of size <= 32)
+  n=  64: conventional     16.4 ms / 262144 mults | Strassen(cutoff 32)     17.1 ms / 229376 mults
+  n= 128: conventional    132.7 ms / 2097152 mults | Strassen(cutoff 32)    183.0 ms / 1605632 mults
+  n= 256: conventional   1142.7 ms / 16777216 mults | Strassen(cutoff 32)    992.3 ms / 11239424 mults
+
+Effect of padding: n=65 is padded to 128
+  Strassen on 65x65 -> 823543 mults, 2285.2 ms  (same cost as a 128x128 matrix)
+
+Strassen needs fewer multiplications (7^k vs 8^k, e.g. 823,543 vs 2,097,152 at n=128) but many more
+additions/subtractions, matrix copies and recursion calls, plus extra memory for temporaries and padding.
+In the pure recursion-to-size-1 version, conventional multiplication was faster for every size tested; using a
+cutoff (see second table) Strassen only reaches roughly break-even at n of about 128-256 in this Python prototype. In optimised libraries the cache-friendly
+conventional method typically wins until n is in the hundreds or thousands.
+JOINT DECISION: use conventional multiplication for small or non-power-of-2 matrices, memory-limited or
+numerically sensitive work (Strassen is slightly less stable); use Strassen (with a cutoff to the
+conventional method) only for very large matrices.

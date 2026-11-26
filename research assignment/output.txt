@@ -1,0 +1,35 @@
+=== Correctness tests ===
+key=5    expected=True  linear=True  binary=True  hash=True  PASS
+key=77   expected=True  linear=True  binary=True  hash=True  PASS
+key=25   expected=True  linear=True  binary=True  hash=True  PASS
+key=6    expected=False linear=False binary=False hash=False PASS
+key=100  expected=False linear=False binary=False hash=False PASS
+Boundary: empty list      -> -1 -1
+Boundary: single element  -> 0 0
+
+=== Performance experiment ===
+        n | algo     | preproc(s) | avg cmp found | avg cmp missing | time/search(us)
+-------------------------------------------------------------------------------------
+     1000 | Linear   |     0.0000 |         504.3 |          1000.0 |           28.90
+     1000 | Binary   |     0.0001 |          17.1 |            20.0 |            1.91
+     1000 | Hash     |     0.0003 |           1.4 |             1.0 |            0.18
+    10000 | Linear   |     0.0000 |        4636.1 |         10000.0 |          291.36
+    10000 | Binary   |     0.0014 |          23.9 |            28.0 |            2.13
+    10000 | Hash     |     0.0030 |           1.4 |             0.7 |            0.19
+   100000 | Linear   |     0.0000 |       53225.4 |        100000.0 |         3670.78
+   100000 | Binary   |     0.0198 |          30.3 |            34.0 |            2.84
+   100000 | Hash     |     0.0388 |           1.5 |             1.1 |            0.40
+  1000000 | Linear   |     0.0000 |      487304.5 |       1000000.0 |        36807.94
+  1000000 | Binary   |     0.3181 |          36.5 |            40.0 |            5.20
+  1000000 | Hash     |     1.3986 |           1.5 |             0.8 |            1.15
+
+=== Day-4 Design Challenge: cost of one day (24 h) ===
+Searches per day                         : 1,200,000
+Linear total comparisons                 : 600,000,000,000
+Binary total comparisons (sort + search) : 43,849,451
+Hash total operations (build + search)   : 2,200,000
+Records change only once a day, so the preprocessing cost is paid once and shared by
+1,200,000 searches. Binary/Hash clearly beat Linear; Hash is best if only exact-match
+lookups are needed, Binary is better if range queries / sorted output are also needed.
+
+Saved comparisons_plot.png

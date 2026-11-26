@@ -1,0 +1,19 @@
+n = 1023; log2(n) ~ 10; n^2/2 ~ 523264
+Input                         Algorithm    comparisons max depth   first partition sizes (left,right)
+Quick-balanced (constructed)  QuickSort           8194        10   [(511, 511), (255, 255), (127, 127), (63, 63)]
+Quick-balanced (constructed)  MergeSort           6990        11   -
+Quick-unbalanced (sorted)     QuickSort         522753      1023   [(0, 1022), (0, 1021), (0, 1020), (0, 1019)]
+Quick-unbalanced (sorted)     MergeSort           5110        11   -
+Random                        QuickSort          10818        21   [(241, 781), (105, 135), (92, 12), (68, 23)]
+Random                        MergeSort           8913        11   -
+
+ANALYSIS
+- Merge Sort always splits exactly in half -> recursion depth ~log2(n), comparisons ~ n log n for ANY input.
+- Quick Sort's split quality depends on pivot value. Balanced pivot -> depth ~log n, ~n log n comparisons.
+  With the first element as pivot on sorted data the splits are (0, n-1): depth n and ~n^2/2 comparisons.
+  Recurrence: T(n) = T(n-1) + n  ->  O(n^2).  A 90:10 split gives T(n)=T(0.9n)+T(0.1n)+n = O(n log n) but
+  with a bigger constant (depth ~ log_{10/9} n).
+JOINT DESIGN QUESTION - information I would want before choosing: how much is already sorted / how
+adversarial the order can be, input size, whether stability is required, memory limits (Merge Sort needs
+O(n) extra), whether data is in memory or on disk, and the cost of comparing items. If nothing is known,
+Merge Sort (predictable) or Quick Sort with random / median-of-three pivot are the safe choices.
